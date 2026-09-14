@@ -1,0 +1,2 @@
+insert into public.membres (user_id, nom, prenoms, statut, contact, role, statut_validation)
+values ('82ba947d-6f38-4422-8a7c-2f67deb66530', 'Admin', 'National', 'assistant', 'fmgexcellence@gmail.com.local', 'admin_national', 'valide');

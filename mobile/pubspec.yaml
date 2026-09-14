@@ -1,0 +1,42 @@
+name: ccb_platform_mobile
+description: >
+  Application mobile — Coordination des Cours Bibliques.
+  Inscription, consultation de fiche et carte de membre, avec mode hors-ligne.
+publish_to: "none"
+version: 0.1.0
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+  flutter: ">=3.19.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+
+  # Backend
+  supabase_flutter: ^2.5.6
+
+  # Stockage local (mode hors-ligne : file d'attente + cache de la fiche)
+  sqflite: ^2.3.3+1
+  path: ^1.9.0
+  path_provider: ^2.1.4
+
+  # Détection de connectivité pour la synchronisation automatique
+  connectivity_plus: ^6.0.5
+
+  # Typographie cohérente avec le dashboard web (Source Serif 4 + Inter)
+  google_fonts: ^6.2.1
+
+  # Génération du QR code affiché sur la carte de membre
+  qr_flutter: ^4.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/

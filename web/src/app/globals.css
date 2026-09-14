@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-navy: #1b2a4a;
+  --color-gold: #b8892b;
+}
+
+body {
+  background-color: #faf7f0;
+  color: #22262f;
+}
+
+::selection {
+  background-color: #b8892b;
+  color: #faf7f0;
+}
+
+/* Focus visible cohérent pour l'accessibilité, sur tous les éléments interactifs */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #b8892b;
+  outline-offset: 2px;
+}
