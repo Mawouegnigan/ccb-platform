@@ -10,7 +10,7 @@ export default async function MembresPage() {
 
   const { data: currentMembre } = await supabase
     .from("membres")
-    .select("role")
+    .select("id, role")
     .eq("user_id", user!.id)
     .single();
 
@@ -50,6 +50,7 @@ export default async function MembresPage() {
       <MembresTable
         membres={membres ?? []}
         currentRole={currentMembre?.role ?? "membre"}
+        currentMembreId={currentMembre?.id ?? ""}
         isAdminNational={isAdminNational}
         regions={regions ?? []}
         sousRegions={sousRegions ?? []}

@@ -41,12 +41,14 @@ function oneOf<T>(v: T | T[] | null): T | null {
 export default function MembresTable({
   membres,
   currentRole,
+  currentMembreId,
   isAdminNational,
   regions,
   sousRegions,
 }: {
   membres: MembreRow[];
   currentRole: RoleType;
+  currentMembreId: string;
   isAdminNational: boolean;
   regions: GeoOption[];
   sousRegions: GeoOption[];
@@ -55,6 +57,7 @@ export default function MembresTable({
   const supabase = createClient();
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [nominationRowId, setNominationRowId] = useState<string | null>(null);
+  const [editRowId, setEditRowId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   async function setValidation(id: string, statut: ValidationStatut) {
@@ -84,6 +87,45 @@ export default function MembresTable({
       return;
     }
     setNominationRowId(null);
+    router.refresh();
+  }
+
+  async function updateMembre(
+    id: string,
+    values: { nom: string; prenoms: string; contact: string; poste: string | null }
+  ) {
+    setPendingId(id);
+    setError(null);
+    // Note : role et statut_validation ne sont volontairement jamais envoyés ici.
+    // Les triggers guard_role_change et guard_validation bloquent de toute façon
+    // toute tentative d'auto-promotion ou d'auto-validation côté DB.
+    const { error } = await supabase.from("membres").update(values).eq("id", id);
+    setPendingId(null);
+    if (error) {
+      setError(error.message);
+      return;
+    }
+    setEditRowId(null);
+    router.refresh();
+  }
+
+  async function revokeAdmin(id: string) {
+    const confirmed = window.confirm(
+      "Retirer les droits d'administration à ce membre ? Il redeviendra un membre simple."
+    );
+    if (!confirmed) return;
+
+    setPendingId(id);
+    setError(null);
+    const { error } = await supabase
+      .from("membres")
+      .update({ role: "membre", admin_region_id: null, admin_sous_region_id: null })
+      .eq("id", id);
+    setPendingId(null);
+    if (error) {
+      setError(error.message);
+      return;
+    }
     router.refresh();
   }
 
@@ -135,6 +177,14 @@ export default function MembresTable({
                     </span>
                   </td>
                   <td className="px-4 py-3 text-right space-x-2 whitespace-nowrap">
+                    {m.id === currentMembreId && (
+                      <button
+                        onClick={() => setEditRowId(editRowId === m.id ? null : m.id)}
+                        className="text-navy hover:underline text-xs font-medium"
+                      >
+                        Modifier
+                      </button>
+                    )}
                     {peutValiderOuRejeter && m.statut_validation === "en_attente" && (
                       <>
                         <button
@@ -166,8 +216,29 @@ export default function MembresTable({
                         {m.role === "admin_region" ? "Admin. Région" : m.role === "admin_sous_region" ? "Admin. Sous-Région" : "Admin. National"}
                       </span>
                     )}
+                    {isAdminNational && (m.role === "admin_region" || m.role === "admin_sous_region") && (
+                      <button
+                        disabled={isPending}
+                        onClick={() => revokeAdmin(m.id)}
+                        className="text-red-700 hover:underline text-xs font-medium disabled:opacity-50"
+                      >
+                        Retirer le pouvoir
+                      </button>
+                    )}
                   </td>
                 </tr>
+                {editRowId === m.id && (
+                  <tr className="border-t border-line bg-navy/5">
+                    <td colSpan={6} className="px-4 py-4">
+                      <EditForm
+                        membre={m}
+                        pending={pendingId === m.id}
+                        onSubmit={(values) => updateMembre(m.id, values)}
+                        onCancel={() => setEditRowId(null)}
+                      />
+                    </td>
+                  </tr>
+                )}
                 {nominationRowId === m.id && (
                   <tr className="border-t border-line bg-navy/5">
                     <td colSpan={6} className="px-4 py-4">
@@ -186,6 +257,70 @@ export default function MembresTable({
           })}
         </tbody>
       </table>
+    </div>
+  );
+}
+
+function EditForm({
+  membre,
+  pending,
+  onSubmit,
+  onCancel,
+}: {
+  membre: MembreRow;
+  pending: boolean;
+  onSubmit: (values: { nom: string; prenoms: string; contact: string; poste: string | null }) => void;
+  onCancel: () => void;
+}) {
+  const [nom, setNom] = useState(membre.nom);
+  const [prenoms, setPrenoms] = useState(membre.prenoms);
+  const [contact, setContact] = useState(membre.contact);
+  const [poste, setPoste] = useState(membre.poste ?? "");
+
+  return (
+    <div className="flex flex-wrap items-end gap-3">
+      <div>
+        <label className="block text-xs font-medium text-ink/70 mb-1">Prénoms</label>
+        <input
+          value={prenoms}
+          onChange={(e) => setPrenoms(e.target.value)}
+          className="rounded border border-line px-2 py-1.5 bg-white text-sm"
+        />
+      </div>
+      <div>
+        <label className="block text-xs font-medium text-ink/70 mb-1">Nom</label>
+        <input
+          value={nom}
+          onChange={(e) => setNom(e.target.value)}
+          className="rounded border border-line px-2 py-1.5 bg-white text-sm"
+        />
+      </div>
+      <div>
+        <label className="block text-xs font-medium text-ink/70 mb-1">Contact</label>
+        <input
+          value={contact}
+          onChange={(e) => setContact(e.target.value)}
+          className="rounded border border-line px-2 py-1.5 bg-white text-sm"
+        />
+      </div>
+      <div>
+        <label className="block text-xs font-medium text-ink/70 mb-1">Poste</label>
+        <input
+          value={poste}
+          onChange={(e) => setPoste(e.target.value)}
+          className="rounded border border-line px-2 py-1.5 bg-white text-sm"
+        />
+      </div>
+      <button
+        disabled={pending || !nom || !prenoms || !contact}
+        onClick={() => onSubmit({ nom, prenoms, contact, poste: poste || null })}
+        className="px-4 py-1.5 rounded bg-navy text-white text-sm disabled:opacity-50"
+      >
+        {pending ? "Enregistrement…" : "Enregistrer"}
+      </button>
+      <button onClick={onCancel} className="px-3 py-1.5 text-sm text-ink/60">
+        Annuler
+      </button>
     </div>
   );
 }
