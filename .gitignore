@@ -23,6 +23,7 @@ mobile/**/android/.gradle/
 # --- Supabase (backend) ---
 backend/.env
 backend/supabase/.temp/
+backend/supabase/snippets/
 
 # --- OS / editors ---
 .DS_Store
