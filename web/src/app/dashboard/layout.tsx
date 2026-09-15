@@ -11,6 +11,10 @@ const ROLE_LABELS: Record<RoleType, string> = {
   membre: "Membre",
 };
 
+// Rôles autorisés à accéder à l'espace /dashboard.
+// Un simple membre ne doit jamais atterrir ici, même en tapant l'URL directement.
+const ROLES_AUTORISES: RoleType[] = ["admin_national", "admin_region", "admin_sous_region"];
+
 export default async function DashboardLayout({
   children,
 }: {
@@ -34,14 +38,19 @@ export default async function DashboardLayout({
 
   const role = membre?.role ?? "membre";
 
+  // Garde de rôle : un membre simple (ou un profil introuvable) est renvoyé
+  // vers son propre profil plutôt que vers l'espace d'administration.
+  if (!ROLES_AUTORISES.includes(role)) {
+    redirect("/profil");
+  }
+
   return (
     <div className="min-h-screen flex bg-parchment">
       <aside className="w-64 bg-navy text-white flex flex-col shrink-0">
         <div className="px-6 py-6 border-b border-white/10">
-          <p className="text-xs uppercase tracking-wide text-gold-light/90">
+          <p className="font-display text-lg font-semibold">
             Coordination des Cours Bibliques
           </p>
-          <p className="font-display text-lg font-semibold mt-1">CCB Platform</p>
         </div>
 
         <nav className="flex-1 px-3 py-4 space-y-1">
