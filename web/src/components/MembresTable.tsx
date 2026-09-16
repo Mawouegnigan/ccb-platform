@@ -15,6 +15,7 @@ type MembreRow = {
   statut_validation: ValidationStatut;
   role: RoleType;
   date_inscription: string;
+  identifiant: string | null;
   sous_regions: { nom: string } | { nom: string }[] | null;
   paroisses: { nom: string } | { nom: string }[] | null;
 };
@@ -146,6 +147,7 @@ export default function MembresTable({
         <thead className="bg-navy/5 text-navy text-left">
           <tr>
             <th className="px-4 py-3 font-medium">Nom</th>
+            <th className="px-4 py-3 font-medium">Identifiant</th>
             <th className="px-4 py-3 font-medium">Statut</th>
             <th className="px-4 py-3 font-medium">Sous-région</th>
             <th className="px-4 py-3 font-medium">Paroisse</th>
@@ -165,6 +167,13 @@ export default function MembresTable({
                   <td className="px-4 py-3">
                     <p className="font-medium text-ink">{m.prenoms} {m.nom}</p>
                     <p className="text-ink/50 text-xs">{m.contact}</p>
+                  </td>
+                  <td className="px-4 py-3">
+                    {m.identifiant ? (
+                      <span className="font-mono text-xs text-navy">{m.identifiant}</span>
+                    ) : (
+                      <span className="text-ink/30 text-xs italic">Non attribué</span>
+                    )}
                   </td>
                   <td className="px-4 py-3 text-ink/70 capitalize">
                     {m.statut}{m.poste ? ` · ${m.poste}` : ""}
@@ -229,7 +238,7 @@ export default function MembresTable({
                 </tr>
                 {editRowId === m.id && (
                   <tr className="border-t border-line bg-navy/5">
-                    <td colSpan={6} className="px-4 py-4">
+                    <td colSpan={7} className="px-4 py-4">
                       <EditForm
                         membre={m}
                         pending={pendingId === m.id}
@@ -241,7 +250,7 @@ export default function MembresTable({
                 )}
                 {nominationRowId === m.id && (
                   <tr className="border-t border-line bg-navy/5">
-                    <td colSpan={6} className="px-4 py-4">
+                    <td colSpan={7} className="px-4 py-4">
                       <NominationForm
                         regions={regions}
                         sousRegions={sousRegions}

@@ -31,6 +31,8 @@ type MembreProfil = {
   statut_validation: ValidationStatut;
   role: RoleType;
   date_inscription: string;
+  photo_url: string | null;
+  identifiant: string | null;
   sous_regions: { nom: string } | { nom: string }[] | null;
   paroisses: { nom: string } | { nom: string }[] | null;
 };
@@ -52,7 +54,7 @@ export default async function ProfilPage() {
   const { data: membreData } = await supabase
     .from("membres")
     .select(
-      "id, nom, prenoms, statut, poste, contact, statut_validation, role, date_inscription, sous_regions!membres_sous_region_id_fkey(nom), paroisses(nom)"
+      "id, nom, prenoms, statut, poste, contact, statut_validation, role, date_inscription, photo_url, identifiant, sous_regions!membres_sous_region_id_fkey(nom), paroisses(nom)"
     )
     .eq("user_id", user!.id)
     .single();
@@ -72,6 +74,16 @@ export default async function ProfilPage() {
     ? membre.paroisses[0]?.nom
     : membre.paroisses?.nom;
 
+  // Bucket privé : on génère une URL signée à courte durée de vie plutôt
+  // que de stocker/exposer une URL publique en base.
+  let photoSignedUrl: string | null = null;
+  if (membre.photo_url) {
+    const { data: signedData } = await supabase.storage
+      .from("photos-profil")
+      .createSignedUrl(membre.photo_url, 60 * 60);
+    photoSignedUrl = signedData?.signedUrl ?? null;
+  }
+
   return (
     <div className="min-h-screen bg-parchment">
       <header className="bg-navy text-white px-8 py-5 flex items-center justify-between">
@@ -90,9 +102,15 @@ export default async function ProfilPage() {
         <h1 className="font-display text-2xl text-navy font-semibold mb-1">
           Mon profil
         </h1>
-        <p className="text-ink/60 mb-8">
+        <p className="text-ink/60 mb-1">
           {membre.prenoms} {membre.nom} — {ROLE_LABELS[membre.role as RoleType]}
         </p>
+        {membre.identifiant && (
+          <p className="font-mono text-sm text-navy/80 mb-8">
+            {membre.identifiant}
+          </p>
+        )}
+        {!membre.identifiant && <div className="mb-8" />}
 
         <div className="rounded border border-line bg-white p-6 mb-6">
           <dl className="grid grid-cols-2 gap-4 text-sm">
@@ -130,6 +148,7 @@ export default async function ProfilPage() {
             prenoms={membre.prenoms}
             contact={membre.contact}
             poste={membre.poste}
+            photoSignedUrl={photoSignedUrl}
           />
         </div>
       </main>

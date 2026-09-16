@@ -19,7 +19,7 @@ export default async function MembresPage() {
   const { data: membres, error: membresError } = await supabase
     .from("membres")
     .select(
-      "id, nom, prenoms, statut, poste, contact, statut_validation, role, date_inscription, sous_regions!membres_sous_region_id_fkey(nom), paroisses(nom)"
+      "id, nom, prenoms, statut, poste, contact, statut_validation, role, date_inscription, identifiant, sous_regions!membres_sous_region_id_fkey(nom), paroisses(nom)"
     )
     .order("date_inscription", { ascending: false });
 

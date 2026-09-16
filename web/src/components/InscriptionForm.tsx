@@ -42,6 +42,7 @@ export default function InscriptionForm({
   const [form, setForm] = useState({
     email: "",
     password: "",
+    confirmPassword: "",
     nom: "",
     prenoms: "",
     statut: "moniteur" as "moniteur" | "assistant",
@@ -71,6 +72,11 @@ export default function InscriptionForm({
   async function checkDuplicatesThenSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+
+    if (form.password !== form.confirmPassword) {
+      setError("Les deux mots de passe ne correspondent pas.");
+      return;
+    }
 
     if (!form.charteAcceptee || !form.reglementAccepte) {
       setError("Merci d'accepter la charte et le règlement intérieur pour continuer.");
@@ -213,8 +219,15 @@ export default function InscriptionForm({
         </Field>
       </div>
 
-      <Field label="Contact (téléphone ou email)">
-        <input required value={form.contact} onChange={(e) => update("contact", e.target.value)} className="input" />
+      <Field label="Téléphone">
+        <input
+          type="tel"
+          required
+          value={form.contact}
+          onChange={(e) => update("contact", e.target.value)}
+          className="input"
+          placeholder="Ex. 0195648246"
+        />
       </Field>
 
       <div className="grid grid-cols-2 gap-4">
@@ -270,12 +283,30 @@ export default function InscriptionForm({
 
       <hr className="border-line" />
 
+      <Field label="Email (identifiant de connexion)">
+        <input type="email" required value={form.email} onChange={(e) => update("email", e.target.value)} className="input" />
+      </Field>
+
       <div className="grid grid-cols-2 gap-4">
-        <Field label="Email (identifiant de connexion)">
-          <input type="email" required value={form.email} onChange={(e) => update("email", e.target.value)} className="input" />
-        </Field>
         <Field label="Mot de passe">
-          <input type="password" required minLength={8} value={form.password} onChange={(e) => update("password", e.target.value)} className="input" />
+          <input
+            type="password"
+            required
+            minLength={8}
+            value={form.password}
+            onChange={(e) => update("password", e.target.value)}
+            className="input"
+          />
+        </Field>
+        <Field label="Confirmer le mot de passe">
+          <input
+            type="password"
+            required
+            minLength={8}
+            value={form.confirmPassword}
+            onChange={(e) => update("confirmPassword", e.target.value)}
+            className="input"
+          />
         </Field>
       </div>
 

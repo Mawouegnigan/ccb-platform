@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import InscriptionForm from "@/components/InscriptionForm";
+import Link from "next/link";
 
 export default async function InscriptionPage() {
   const supabase = await createClient();
@@ -13,9 +14,14 @@ export default async function InscriptionPage() {
   return (
     <main className="min-h-screen bg-parchment px-6 py-12">
       <div className="max-w-xl mx-auto">
-        <p className="text-sm tracking-wide text-navy/60 mb-2">
-          Coordination des Cours Bibliques
-        </p>
+        <div className="flex items-start justify-between mb-2">
+          <p className="text-sm tracking-wide text-navy/60">
+            Coordination des Cours Bibliques
+          </p>
+          <Link href="/login" className="text-sm text-navy hover:underline">
+            Déjà inscrit ? Se connecter
+          </Link>
+        </div>
         <h1 className="font-display text-3xl text-navy font-semibold mb-1">
           Inscription
         </h1>
