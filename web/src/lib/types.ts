@@ -21,6 +21,7 @@ export type DocumentType =
 export interface Region {
   id: string;
   nom: string;
+  code: string;
   created_at: string;
 }
 
@@ -50,6 +51,7 @@ export interface Membre {
   sous_region_id: string | null;
   region_id: string | null;
   photo_url: string | null;
+  identifiant: string | null;
   role: RoleType;
   admin_region_id: string | null;
   admin_sous_region_id: string | null;

@@ -8,7 +8,7 @@ import { createClient } from "@/lib/supabase/client";
 export default function LoginPage() {
   const router = useRouter();
   const supabase = createClient();
-  const [email, setEmail] = useState("");
+  const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -18,12 +18,35 @@ export default function LoginPage() {
     setError(null);
     setLoading(true);
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    // Résout l'identifiant CCB en email si besoin ; un email est renvoyé
+    // tel quel par la route. En cas d'échec de résolution, on tente quand
+    // même signInWithPassword avec la saisie brute plutôt que de révéler
+    // que la résolution a échoué — le message d'erreur final reste
+    // générique dans tous les cas.
+    let resolvedEmail = login.trim();
+    try {
+      const res = await fetch("/api/resolve-login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ login: resolvedEmail }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        resolvedEmail = data.email;
+      }
+    } catch {
+      // Échec réseau sur la résolution : on continue avec la saisie brute.
+    }
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email: resolvedEmail,
+      password,
+    });
 
     setLoading(false);
 
     if (error) {
-      setError("Email ou mot de passe incorrect.");
+      setError("Email/identifiant ou mot de passe incorrect.");
       return;
     }
 
@@ -38,20 +61,21 @@ export default function LoginPage() {
           Connexion
         </h1>
         <p className="text-sm text-ink/60 mb-6">
-          Réservé aux administrateurs (national, région, sous-région).
+          Connectez-vous avec votre email ou votre identifiant CCB.
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-ink mb-1">
-              Email
+            <label htmlFor="login" className="block text-sm font-medium text-ink mb-1">
+              Email ou Identifiant
             </label>
             <input
-              id="email"
-              type="email"
+              id="login"
+              type="text"
               required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={login}
+              onChange={(e) => setLogin(e.target.value)}
+              placeholder="vous@exemple.com ou CCB-LITG-0001"
               className="w-full rounded border border-line px-3 py-2 bg-white"
             />
           </div>
