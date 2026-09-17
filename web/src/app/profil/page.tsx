@@ -106,11 +106,24 @@ export default async function ProfilPage() {
           {membre.prenoms} {membre.nom} — {ROLE_LABELS[membre.role as RoleType]}
         </p>
         {membre.identifiant && (
-          <p className="font-mono text-sm text-navy/80 mb-8">
+          <p className="font-mono text-sm text-navy/80 mb-3">
             {membre.identifiant}
           </p>
         )}
-        {!membre.identifiant && <div className="mb-8" />}
+
+        {membre.identifiant && membre.statut_validation === "valide" && (
+          
+          <a href={`/api/carte-membre/${membre.id}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block mb-8 text-sm px-3 py-1.5 rounded border border-navy/20 text-navy hover:bg-navy/5 transition-colors"
+          >
+            Télécharger ma carte de membre (PDF)
+          </a>
+        )}
+        {!(membre.identifiant && membre.statut_validation === "valide") && (
+          <div className="mb-8" />
+        )}
 
         <div className="rounded border border-line bg-white p-6 mb-6">
           <dl className="grid grid-cols-2 gap-4 text-sm">

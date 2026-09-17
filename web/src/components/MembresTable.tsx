@@ -186,6 +186,17 @@ export default function MembresTable({
                     </span>
                   </td>
                   <td className="px-4 py-3 text-right space-x-2 whitespace-nowrap">
+                    {m.identifiant && m.statut_validation === "valide" && (
+                      
+                      
+                      <a href={`/api/carte-membre/${m.id}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-navy hover:underline text-xs font-medium"
+                      >
+                        Carte PDF
+                      </a>
+                    )}
                     {m.id === currentMembreId && (
                       <button
                         onClick={() => setEditRowId(editRowId === m.id ? null : m.id)}
