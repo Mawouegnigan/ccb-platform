@@ -90,12 +90,21 @@ export interface CcbDocument {
 export interface Database {
   public: {
     Tables: {
-      regions: { Row: Region; Insert: Partial<Region>; Update: Partial<Region> };
-      sous_regions: { Row: SousRegion; Insert: Partial<SousRegion>; Update: Partial<SousRegion> };
-      paroisses: { Row: Paroisse; Insert: Partial<Paroisse>; Update: Partial<Paroisse> };
-      membres: { Row: Membre; Insert: Partial<Membre>; Update: Partial<Membre> };
-      roles_attribues: { Row: RoleAttribue; Insert: Partial<RoleAttribue>; Update: Partial<RoleAttribue> };
-      documents: { Row: CcbDocument; Insert: Partial<CcbDocument>; Update: Partial<CcbDocument> };
+      regions: { Row: Region; Insert: Partial<Region>; Update: Partial<Region>; Relationships: [] };
+      sous_regions: { Row: SousRegion; Insert: Partial<SousRegion>; Update: Partial<SousRegion>; Relationships: [] };
+      paroisses: { Row: Paroisse; Insert: Partial<Paroisse>; Update: Partial<Paroisse>; Relationships: [] };
+      membres: { Row: Membre; Insert: Partial<Membre>; Update: Partial<Membre>; Relationships: [] };
+      roles_attribues: { Row: RoleAttribue; Insert: Partial<RoleAttribue>; Update: Partial<RoleAttribue>; Relationships: [] };
+      documents: { Row: CcbDocument; Insert: Partial<CcbDocument>; Update: Partial<CcbDocument>; Relationships: [] };
     };
+    Views: Record<string, never>;
+    Functions: Record<string, never>;
+    Enums: {
+      role_type: RoleType;
+      membre_statut: MembreStatut;
+      validation_statut: ValidationStatut;
+      document_type: DocumentType;
+    };
+    CompositeTypes: Record<string, never>;
   };
 }

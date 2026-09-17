@@ -24,11 +24,11 @@ export async function POST(request: Request) {
   // (nécessaire car auth.users n'est pas accessible par la clé publique).
   const admin = createAdminClient();
 
-  const { data: membre, error: membreError } = await admin
+  const { data: membre, error: membreError } = (await admin
     .from("membres")
     .select("user_id")
     .eq("identifiant", trimmed.toUpperCase())
-    .maybeSingle();
+    .maybeSingle()) as { data: { user_id: string | null } | null; error: unknown };
 
   // Volontairement pas d'information différenciée sur la nature de l'échec
   // (identifiant inexistant, membre sans user_id, erreur réseau...) — pour

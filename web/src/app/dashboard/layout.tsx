@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Route } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import LogoutButton from "@/components/LogoutButton";
@@ -30,13 +31,13 @@ export default async function DashboardLayout({
     redirect("/login");
   }
 
-  const { data: membre } = await supabase
+  const { data: membre } = (await supabase
     .from("membres")
     .select("nom, prenoms, role")
     .eq("user_id", user!.id)
-    .single();
+    .single()) as { data: { nom: string; prenoms: string; role: RoleType } | null };
 
-  const role = membre?.role ?? "membre";
+  const role: RoleType = membre?.role ?? "membre";
 
   // Garde de rôle : un membre simple (ou un profil introuvable) est renvoyé
   // vers son propre profil plutôt que vers l'espace d'administration.
@@ -74,7 +75,7 @@ export default async function DashboardLayout({
   );
 }
 
-function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
+function NavLink({ href, children }: { href: Route; children: React.ReactNode }) {
   return (
     <Link
       href={href}
