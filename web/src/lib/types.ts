@@ -16,7 +16,9 @@ export type DocumentType =
   | "support_formation"
   | "conference_video"
   | "conference_image"
-  | "autre";
+  | "autre"
+  | "annonce"
+  | "actualite";
 
 export interface Region {
   id: string;
@@ -87,6 +89,14 @@ export interface CcbDocument {
   updated_at: string;
 }
 
+export interface DocumentPhoto {
+  id: string;
+  document_id: string;
+  photo_url: string;
+  ordre: number;
+  created_at: string;
+}
+
 export interface Database {
   public: {
     Tables: {
@@ -96,6 +106,7 @@ export interface Database {
       membres: { Row: Membre; Insert: Partial<Membre>; Update: Partial<Membre>; Relationships: [] };
       roles_attribues: { Row: RoleAttribue; Insert: Partial<RoleAttribue>; Update: Partial<RoleAttribue>; Relationships: [] };
       documents: { Row: CcbDocument; Insert: Partial<CcbDocument>; Update: Partial<CcbDocument>; Relationships: [] };
+      documents_photos: { Row: DocumentPhoto; Insert: Partial<DocumentPhoto>; Update: Partial<DocumentPhoto>; Relationships: [] };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
