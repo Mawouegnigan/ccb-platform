@@ -99,6 +99,12 @@ export default async function ProfilPage() {
       </header>
 
       <main className="max-w-2xl mx-auto px-6 py-10">
+                
+        <a href="/annonces"
+          className="inline-block mb-4 text-sm text-navy hover:underline font-medium"
+        >
+          Voir les annonces &amp; actualités →
+        </a>
         <h1 className="font-display text-2xl text-navy font-semibold mb-1">
           Mon profil
         </h1>

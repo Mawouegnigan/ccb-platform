@@ -57,6 +57,7 @@ export default async function DashboardLayout({
         <nav className="flex-1 px-3 py-4 space-y-1">
           <NavLink href="/dashboard">Vue d&apos;ensemble</NavLink>
           <NavLink href="/dashboard/membres">Membres</NavLink>
+          <NavLink href="/annonces">Annonces &amp; Actualités</NavLink>
         </nav>
 
         <div className="px-6 py-4 border-t border-white/10 flex items-center justify-between">
