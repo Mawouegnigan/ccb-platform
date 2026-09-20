@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import type { Membre } from "@/lib/types";
 import LectureModal from "@/components/LectureModal";
+import PasswordInput from "@/components/PasswordInput";
 import { REGLEMENT_INTERIEUR, CHARTE_MONITEUR } from "@/lib/documents-legaux";
 
 type RegionOption = {
@@ -294,22 +295,20 @@ export default function InscriptionForm({
 
         <div className="grid grid-cols-2 gap-4">
           <Field label="Mot de passe">
-            <input
-              type="password"
+            <PasswordInput
               required
               minLength={8}
               value={form.password}
-              onChange={(e) => update("password", e.target.value)}
+              onChange={(v) => update("password", v)}
               className="input"
             />
           </Field>
           <Field label="Confirmer le mot de passe">
-            <input
-              type="password"
+            <PasswordInput
               required
               minLength={8}
               value={form.confirmPassword}
-              onChange={(e) => update("confirmPassword", e.target.value)}
+              onChange={(v) => update("confirmPassword", v)}
               className="input"
             />
           </Field>
