@@ -74,6 +74,12 @@ export default function DashboardShell({
           <NavLink href="/annonces" onClick={() => setMenuOuvert(false)}>
             Annonces &amp; Actualités
           </NavLink>
+          <NavLink href="/a-propos" onClick={() => setMenuOuvert(false)}>
+            À propos
+          </NavLink>
+          <NavLink href="/profil" onClick={() => setMenuOuvert(false)}>
+            Mon profil
+          </NavLink>
         </nav>
 
         <div className="px-6 py-4 border-t border-white/10 flex items-center justify-between">

@@ -99,12 +99,19 @@ export default async function ProfilPage() {
       </header>
 
       <main className="max-w-2xl mx-auto px-6 py-10">
-                
-        <a href="/annonces"
-          className="inline-block mb-4 text-sm text-navy hover:underline font-medium"
-        >
-          Voir les annonces &amp; actualités →
-        </a>
+
+        <div className="flex flex-wrap gap-4 mb-4">
+          <a href="/annonces"
+            className="inline-block text-sm text-navy hover:underline font-medium"
+          >
+            Voir les annonces &amp; actualités →
+          </a>
+          <a href="/a-propos"
+            className="inline-block text-sm text-navy hover:underline font-medium"
+          >
+            À propos →
+          </a>
+        </div>
         <h1 className="font-display text-2xl text-navy font-semibold mb-1">
           Mon profil
         </h1>
@@ -118,7 +125,7 @@ export default async function ProfilPage() {
         )}
 
         {membre.identifiant && membre.statut_validation === "valide" && (
-          
+
           <a href={`/api/carte-membre/${membre.id}`}
             target="_blank"
             rel="noopener noreferrer"

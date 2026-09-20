@@ -6,9 +6,11 @@ import LogoutButton from "@/components/LogoutButton";
 export default function AnnoncesHeader({
   retourHref,
   retourLabel,
+  titre = "Annonces & Actualités",
 }: {
   retourHref: string;
   retourLabel: string;
+  titre?: string;
 }) {
   const [menuOuvert, setMenuOuvert] = useState(false);
 
@@ -16,8 +18,7 @@ export default function AnnoncesHeader({
     <header className="bg-navy text-white px-6 md:px-8 py-4 md:py-5 relative">
       <div className="flex items-center justify-between">
         <div>
-          
-          <a  href={retourHref}
+          <a href={retourHref}
             className="hidden md:inline-block text-xs text-white/70 hover:text-white hover:underline mb-2"
           >
             ← {retourLabel}
@@ -26,7 +27,7 @@ export default function AnnoncesHeader({
             Église du Christianisme Céleste
           </p>
           <p className="font-display text-lg font-semibold mt-1">
-            Annonces &amp; Actualités
+            {titre}
           </p>
         </div>
 
@@ -47,8 +48,7 @@ export default function AnnoncesHeader({
 
       {menuOuvert && (
         <div className="md:hidden mt-4 pt-4 border-t border-white/10 flex items-center justify-between">
-          
-          <a  href={retourHref}
+          <a href={retourHref}
             className="text-sm text-white/80 hover:text-white hover:underline"
           >
             ← {retourLabel}

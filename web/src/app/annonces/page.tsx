@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import AnnoncesHeader from "@/components/AnnoncesHeader";
+import DashboardShell from "@/components/DashboardShell";
 import { createClient } from "@/lib/supabase/server";
-import LogoutButton from "@/components/LogoutButton";
 import AnnoncesManager from "@/components/AnnoncesManager";
 import type { RoleType } from "@/lib/types";
 
@@ -64,6 +64,7 @@ export default async function AnnoncesPage() {
   }
 
   const isAdminNational = membre!.role === "admin_national";
+  const isAdmin = membre!.role !== "membre";
 
   // RLS restreint déjà cette lecture aux utilisateurs authentifiés.
   const { data: documentsData, error: documentsError } = (await supabase
@@ -131,19 +132,31 @@ export default async function AnnoncesPage() {
     })
   );
 
+  const contenu = (
+    <AnnoncesManager
+      documents={documentsDisplay}
+      isAdminNational={isAdminNational}
+      currentMembreId={membre!.id}
+    />
+  );
+
+  if (isAdmin) {
+    return (
+      <DashboardShell
+        role={membre!.role}
+        nom={membre!.nom}
+        prenoms={membre!.prenoms}
+        email={user.email ?? ""}
+      >
+        <div className="max-w-3xl mx-auto">{contenu}</div>
+      </DashboardShell>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-parchment">
-      <AnnoncesHeader
-        retourHref={isAdminNational ? "/dashboard" : "/profil"}
-        retourLabel={isAdminNational ? "Retour au tableau de bord" : "Retour à mon profil"}
-      />
-      <main className="max-w-3xl mx-auto px-6 py-10">
-        <AnnoncesManager
-          documents={documentsDisplay}
-          isAdminNational={isAdminNational}
-          currentMembreId={membre!.id}
-        />
-      </main>
+      <AnnoncesHeader retourHref="/profil" retourLabel="Retour à mon profil" />
+      <main className="max-w-3xl mx-auto px-6 py-10">{contenu}</main>
     </div>
   );
 }
