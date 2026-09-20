@@ -143,6 +143,7 @@ export default function MembresTable({
   return (
     <div className="border border-line rounded overflow-hidden bg-white">
       {error && <p className="text-sm text-red-700 px-4 py-2 bg-red-50 border-b border-red-100">{error}</p>}
+      <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead className="bg-navy/5 text-navy text-left">
           <tr>
@@ -277,6 +278,7 @@ export default function MembresTable({
           })}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }

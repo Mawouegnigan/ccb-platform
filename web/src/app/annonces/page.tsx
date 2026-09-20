@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import AnnoncesHeader from "@/components/AnnoncesHeader";
 import { createClient } from "@/lib/supabase/server";
 import LogoutButton from "@/components/LogoutButton";
 import AnnoncesManager from "@/components/AnnoncesManager";
@@ -132,24 +133,10 @@ export default async function AnnoncesPage() {
 
   return (
     <div className="min-h-screen bg-parchment">
-      <header className="bg-navy text-white px-8 py-5 flex items-center justify-between">
-        <div>
-          
-          <a  href={isAdminNational ? "/dashboard" : "/profil"}
-            className="text-xs text-white/70 hover:text-white hover:underline mb-2 inline-block"
-          >
-            ← {isAdminNational ? "Retour au tableau de bord" : "Retour à mon profil"}
-          </a>
-          <p className="text-xs uppercase tracking-wide text-gold-light/90">
-            Église du Christianisme Céleste
-          </p>
-          <p className="font-display text-lg font-semibold mt-1">
-            Annonces &amp; Actualités
-          </p>
-        </div>
-        <LogoutButton />
-      </header>
-
+      <AnnoncesHeader
+        retourHref={isAdminNational ? "/dashboard" : "/profil"}
+        retourLabel={isAdminNational ? "Retour au tableau de bord" : "Retour à mon profil"}
+      />
       <main className="max-w-3xl mx-auto px-6 py-10">
         <AnnoncesManager
           documents={documentsDisplay}
