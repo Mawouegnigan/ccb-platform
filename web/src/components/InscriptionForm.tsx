@@ -8,6 +8,13 @@ import LectureModal from "@/components/LectureModal";
 import PasswordInput from "@/components/PasswordInput";
 import { REGLEMENT_INTERIEUR, CHARTE_MONITEUR } from "@/lib/documents-legaux";
 
+const MAX_PHOTO_SIZE = 2 * 1024 * 1024; // 2 Mo, aligné sur la limite du bucket
+const ALLOWED_PHOTO_TYPES: Record<string, string> = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+};
+
 type RegionOption = {
   id: string;
   nom: string;
@@ -44,6 +51,9 @@ export default function InscriptionForm({
 
   const [modalOuverte, setModalOuverte] = useState<"charte" | "reglement" | null>(null);
 
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoError, setPhotoError] = useState<string | null>(null);
+
   const [form, setForm] = useState({
     email: "",
     password: "",
@@ -72,6 +82,26 @@ export default function InscriptionForm({
 
   function update<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
     setForm((f) => ({ ...f, [key]: value }));
+  }
+
+  function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setPhotoError(null);
+
+    if (!ALLOWED_PHOTO_TYPES[file.type]) {
+      setPhotoError("Format non supporté. Utilisez JPEG, PNG ou WebP.");
+      e.target.value = "";
+      return;
+    }
+    if (file.size > MAX_PHOTO_SIZE) {
+      setPhotoError("Photo trop lourde (2 Mo maximum).");
+      e.target.value = "";
+      return;
+    }
+
+    setPhotoFile(file);
   }
 
   async function checkDuplicatesThenSubmit(e: React.FormEvent) {
@@ -124,28 +154,47 @@ export default function InscriptionForm({
       return;
     }
 
-    const { error: insertError } = await supabase.from("membres").insert({
-      user_id: signUpData.user.id,
-      nom: form.nom,
-      prenoms: form.prenoms,
-      statut: form.statut,
-      poste: form.poste || null,
-      contact: form.contact,
-      sous_region_id: form.sousRegionId,
-      paroisse_id: form.paroisseId || null,
-      role: "membre",
-      statut_validation: "en_attente",
-      charte_acceptee: form.charteAcceptee,
-      reglement_interieur_accepte: form.reglementAccepte,
-    });
+    const { data: membreData, error: insertError } = await supabase
+      .from("membres")
+      .insert({
+        user_id: signUpData.user.id,
+        nom: form.nom,
+        prenoms: form.prenoms,
+        statut: form.statut,
+        poste: form.poste || null,
+        contact: form.contact,
+        sous_region_id: form.sousRegionId,
+        paroisse_id: form.paroisseId || null,
+        role: "membre",
+        statut_validation: "en_attente",
+        charte_acceptee: form.charteAcceptee,
+        reglement_interieur_accepte: form.reglementAccepte,
+      })
+      .select("id")
+      .single();
 
-    setLoading(false);
-
-    if (insertError) {
-      setError("Compte créé, mais l'enregistrement de la fiche a échoué : " + insertError.message);
+    if (insertError || !membreData) {
+      setLoading(false);
+      setError("Compte créé, mais l'enregistrement de la fiche a échoué : " + insertError?.message);
       return;
     }
 
+    if (photoFile) {
+      const ext = ALLOWED_PHOTO_TYPES[photoFile.type];
+      const path = `${membreData.id}/avatar.${ext}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("photos-profil")
+        .upload(path, photoFile, { upsert: true, contentType: photoFile.type });
+
+      if (!uploadError) {
+        await supabase.from("membres").update({ photo_url: path }).eq("id", membreData.id);
+      }
+      // Une erreur d'upload ici n'empêche pas l'inscription : la photo reste
+      // ajoutable plus tard depuis /profil (ProfilForm.tsx).
+    }
+
+    setLoading(false);
     setStep("envoi");
   }
 
@@ -212,6 +261,17 @@ export default function InscriptionForm({
             <input required value={form.prenoms} onChange={(e) => update("prenoms", e.target.value)} className="input" />
           </Field>
         </div>
+
+        <Field label="Photo (facultatif)">
+          <input
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            onChange={handlePhotoChange}
+            className="input"
+          />
+          <p className="text-xs text-ink/50 mt-1">JPEG, PNG ou WebP — 2 Mo maximum.</p>
+          {photoError && <p className="text-xs text-red-700 mt-1">{photoError}</p>}
+        </Field>
 
         <div className="grid grid-cols-2 gap-4">
           <Field label="Statut">
