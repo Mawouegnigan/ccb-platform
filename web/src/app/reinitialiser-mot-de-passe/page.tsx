@@ -1,13 +1,45 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import PasswordInput from "@/components/PasswordInput";
 
 export default function ReinitialiserMotDePassePage() {
+  return (
+    <Suspense fallback={null}>
+      <ReinitialiserMotDePasseForm />
+    </Suspense>
+  );
+}
+
+function ReinitialiserMotDePasseForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const supabase = createClient();
+
+  // Vérification côté client uniquement (jamais via un simple GET serveur) :
+  // les scanners automatiques de liens (Gmail, antivirus, proxys) exécutent
+  // rarement le JavaScript d'une page, contrairement à un lien qui consomme
+  // le token dès son chargement. Voir échange avec le client du 21/09/2026.
+  const [statut, setStatut] = useState<"verification" | "pret" | "erreur">("verification");
+
+  useEffect(() => {
+    const tokenHash = searchParams.get("token_hash");
+    const type = searchParams.get("type");
+
+    if (!tokenHash || type !== "recovery") {
+      setStatut("erreur");
+      return;
+    }
+
+    supabase.auth
+      .verifyOtp({ token_hash: tokenHash, type: "recovery" })
+      .then(({ error }) => {
+        setStatut(error ? "erreur" : "pret");
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -39,6 +71,33 @@ export default function ReinitialiserMotDePassePage() {
     setTimeout(() => {
       router.push("/login");
     }, 2000);
+  }
+
+  if (statut === "verification") {
+    return (
+      <main className="min-h-screen flex items-center justify-center bg-parchment px-6">
+        <p className="text-sm text-ink/60">Vérification du lien…</p>
+      </main>
+    );
+  }
+
+  if (statut === "erreur") {
+    return (
+      <main className="min-h-screen flex items-center justify-center bg-parchment px-6">
+        <div className="w-full max-w-sm text-center">
+          <h1 className="font-display text-2xl text-navy font-semibold mb-2">
+            Lien invalide ou expiré
+          </h1>
+          <p className="text-sm text-ink/70 mb-6">
+            Ce lien de réinitialisation n&apos;est plus valide. Merci de
+            refaire une demande.
+          </p>
+          <a href="/mot-de-passe-oublie" className="text-sm text-navy hover:underline font-medium">
+            ← Refaire une demande
+          </a>
+        </div>
+      </main>
+    );
   }
 
   if (succes) {
