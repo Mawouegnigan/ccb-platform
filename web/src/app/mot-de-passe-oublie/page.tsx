@@ -9,10 +9,12 @@ export default function MotDePasseOubliePage() {
   const [login, setLogin] = useState("");
   const [loading, setLoading] = useState(false);
   const [envoye, setEnvoye] = useState(false);
+  const [erreur, setErreur] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
+    setErreur(null);
 
     // Même logique de résolution que /login : identifiant CCB -> email.
     // En cas d'échec de résolution, on tente quand même avec la saisie
@@ -33,12 +35,25 @@ export default function MotDePasseOubliePage() {
       // Échec réseau sur la résolution : on continue avec la saisie brute.
     }
 
-    await supabase.auth.resetPasswordForEmail(resolvedEmail, {
+    const { error } = await supabase.auth.resetPasswordForEmail(resolvedEmail, {
       redirectTo: `${window.location.origin}/auth/callback?next=/reinitialiser-mot-de-passe`,
     });
 
     setLoading(false);
-    // Toujours le même message, que l'email/identifiant existe ou non.
+
+    // On distingue une vraie erreur serveur (rate limit, SMTP en panne...)
+    // d'un email/identifiant simplement inconnu : Supabase ne renvoie
+    // jamais d'erreur pour ce second cas, donc afficher l'erreur ici ne
+    // révèle rien sur l'existence d'un compte.
+    if (error) {
+      setErreur(
+        error.status === 429
+          ? "Trop de demandes ont été envoyées récemment. Merci de réessayer dans quelques minutes."
+          : "Une erreur est survenue lors de l'envoi. Merci de réessayer dans un instant."
+      );
+      return;
+    }
+
     setEnvoye(true);
   }
 
@@ -82,6 +97,8 @@ export default function MotDePasseOubliePage() {
                   className="w-full rounded border border-line px-3 py-2 bg-white"
                 />
               </div>
+
+              {erreur && <p className="text-sm text-red-700">{erreur}</p>}
 
               <button
                 type="submit"
