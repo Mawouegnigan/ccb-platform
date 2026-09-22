@@ -71,6 +71,9 @@ export default function DashboardShell({
           <NavLink href="/dashboard/membres" onClick={() => setMenuOuvert(false)}>
             Membres
           </NavLink>
+          <NavLink href="/dashboard/statistiques" onClick={() => setMenuOuvert(false)}>
+            Statistiques
+          </NavLink>
           <NavLink href="/annonces" onClick={() => setMenuOuvert(false)}>
             Annonces &amp; Actualités
           </NavLink>
