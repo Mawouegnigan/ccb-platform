@@ -77,6 +77,9 @@ export default function DashboardShell({
           <NavLink href="/annonces" onClick={() => setMenuOuvert(false)}>
             Annonces &amp; Actualités
           </NavLink>
+          <NavLink href="/ressources" onClick={() => setMenuOuvert(false)}>
+            Ressources
+          </NavLink>
           <NavLink href="/a-propos" onClick={() => setMenuOuvert(false)}>
             À propos
           </NavLink>

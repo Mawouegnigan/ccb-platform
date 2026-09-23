@@ -106,6 +106,11 @@ export default async function ProfilPage() {
           >
             Voir les annonces &amp; actualités →
           </a>
+          <a href="/ressources"
+            className="inline-block text-sm text-navy hover:underline font-medium"
+          >
+            Ressources →
+          </a>
           <a href="/a-propos"
             className="inline-block text-sm text-navy hover:underline font-medium"
           >
