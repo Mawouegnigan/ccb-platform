@@ -83,6 +83,11 @@ export default function DashboardShell({
           <NavLink href="/a-propos" onClick={() => setMenuOuvert(false)}>
             À propos
           </NavLink>
+          {role === "admin_national" && (
+            <NavLink href="/dashboard/commentaires" onClick={() => setMenuOuvert(false)}>
+              Commentaires
+            </NavLink>
+          )}
           <NavLink href="/profil" onClick={() => setMenuOuvert(false)}>
             Mon profil
           </NavLink>

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Source_Serif_4 } from "next/font/google";
 import "./globals.css";
+import FeedbackWidget from "@/components/FeedbackWidget";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -30,6 +31,7 @@ export default function RootLayout({
     <html lang="fr">
       <body className={`${inter.variable} ${sourceSerif.variable} font-sans`}>
         {children}
+        <FeedbackWidget />
       </body>
     </html>
   );
