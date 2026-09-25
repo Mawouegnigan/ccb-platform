@@ -25,6 +25,7 @@ backend/.env
 backend/supabase/.temp/
 backend/supabase/snippets/
 supabase/.temp/
+supabase/snippets/
 
 # --- OS / editors ---
 .DS_Store
