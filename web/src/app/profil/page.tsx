@@ -33,6 +33,8 @@ type MembreProfil = {
   date_inscription: string;
   photo_url: string | null;
   identifiant: string | null;
+  sous_region_id: string;
+  paroisse_id: string | null;
   sous_regions: { nom: string } | { nom: string }[] | null;
   paroisses: { nom: string } | { nom: string }[] | null;
 };
@@ -54,7 +56,7 @@ export default async function ProfilPage() {
   const { data: membreData } = await supabase
     .from("membres")
     .select(
-      "id, nom, prenoms, statut, poste, contact, statut_validation, role, date_inscription, photo_url, identifiant, sous_regions!membres_sous_region_id_fkey(nom), paroisses(nom)"
+      "id, nom, prenoms, statut, poste, contact, statut_validation, role, date_inscription, photo_url, identifiant, sous_region_id, paroisse_id, sous_regions!membres_sous_region_id_fkey(nom), paroisses(nom)"
     )
     .eq("user_id", user!.id)
     .single();
@@ -83,6 +85,12 @@ export default async function ProfilPage() {
       .createSignedUrl(membre.photo_url, 60 * 60);
     photoSignedUrl = signedData?.signedUrl ?? null;
   }
+
+  const { data: paroissesData } = await supabase
+    .from("paroisses")
+    .select("id, nom")
+    .eq("sous_region_id", membre.sous_region_id)
+    .order("nom");
 
   return (
     <div className="min-h-screen bg-parchment">
@@ -179,6 +187,8 @@ export default async function ProfilPage() {
             prenoms={membre.prenoms}
             contact={membre.contact}
             poste={membre.poste}
+            paroisseId={membre.paroisse_id}
+            paroisses={paroissesData ?? []}
             photoSignedUrl={photoSignedUrl}
           />
         </div>

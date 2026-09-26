@@ -17,6 +17,8 @@ export default function ProfilForm({
   prenoms: initialPrenoms,
   contact: initialContact,
   poste: initialPoste,
+  paroisseId: initialParoisseId,
+  paroisses,
   photoSignedUrl,
 }: {
   membreId: string;
@@ -24,6 +26,8 @@ export default function ProfilForm({
   prenoms: string;
   contact: string;
   poste: string | null;
+  paroisseId: string | null;
+  paroisses: { id: string; nom: string }[];
   photoSignedUrl: string | null;
 }) {
   const router = useRouter();
@@ -33,6 +37,7 @@ export default function ProfilForm({
   const [prenoms, setPrenoms] = useState(initialPrenoms);
   const [contact, setContact] = useState(initialContact);
   const [poste, setPoste] = useState(initialPoste ?? "");
+  const [paroisseId, setParoisseId] = useState(initialParoisseId ?? "");
 
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -53,7 +58,7 @@ export default function ProfilForm({
     // de ce que fait ce formulaire — sécurité en couches, comme dans MembresTable.
     const { error } = await supabase
       .from("membres")
-      .update({ nom, prenoms, contact, poste: poste || null })
+      .update({ nom, prenoms, contact, poste: poste || null, paroisse_id: paroisseId || null })
       .eq("id", membreId);
 
     setPending(false);
@@ -194,6 +199,19 @@ export default function ProfilForm({
             onChange={(e) => setPoste(e.target.value)}
             className="rounded border border-line px-2 py-1.5 bg-white text-sm"
           />
+        </div>
+        <div>
+          <label className="block text-xs font-medium text-ink/70 mb-1">Paroisse</label>
+          <select
+            value={paroisseId}
+            onChange={(e) => setParoisseId(e.target.value)}
+            className="rounded border border-line px-2 py-1.5 bg-white text-sm"
+          >
+            <option value="">Sélectionner…</option>
+            {paroisses.map((p) => (
+              <option key={p.id} value={p.id}>{p.nom}</option>
+            ))}
+          </select>
         </div>
       </div>
 
