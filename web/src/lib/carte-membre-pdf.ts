@@ -1,4 +1,5 @@
 import PDFDocument from "pdfkit";
+import sizeOf from "image-size";
 
 const COLORS = {
   navy: "#1B2A4A",
@@ -75,10 +76,14 @@ export function buildCarteMembrePdf(opts: {
     doc.save();
     doc.roundedRect(photoX + 2, photoY + 2, photoSize - 4, photoSize - 4, radius - 1).clip();
     if (opts.photoBuffer) {
-      doc.image(opts.photoBuffer, photoX + 2, photoY + 2, {
-        width: photoSize - 4,
-        height: photoSize - 4,
-      });
+      const dims = sizeOf(opts.photoBuffer);
+      const innerSize = photoSize - 4;
+      const scale = Math.max(innerSize / (dims.width ?? innerSize), innerSize / (dims.height ?? innerSize));
+      const w = (dims.width ?? innerSize) * scale;
+      const h = (dims.height ?? innerSize) * scale;
+      const dx = photoX + 2 + (innerSize - w) / 2;
+      const dy = photoY + 2 + (innerSize - h) / 2;
+      doc.image(opts.photoBuffer, dx, dy, { width: w, height: h });
     } else {
       doc.rect(photoX, photoY, photoSize, photoSize).fill(COLORS.parchment);
       const initiales = `${opts.prenoms.charAt(0)}${opts.nom.charAt(0)}`.toUpperCase();
