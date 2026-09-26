@@ -131,7 +131,7 @@ export default async function ProfilPage() {
 
         {membre.identifiant && membre.statut_validation === "valide" && (
 
-          <a href={`/api/carte-membre/${membre.id}`}
+          <a href={`/api/carte-membre/${membre.id}?t=${Date.now()}`}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-block mb-8 text-sm px-3 py-1.5 rounded border border-navy/20 text-navy hover:bg-navy/5 transition-colors"

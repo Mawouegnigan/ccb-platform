@@ -92,16 +92,14 @@ export function buildCarteMembrePdf(opts: {
 
     // --- Nom / rôle / paroisse ---
     let y = photoY + photoSize + 8;
+    const nomComplet = `${opts.prenoms.toUpperCase()} ${opts.nom.toUpperCase()}`;
+    doc.font("Times-Roman").fontSize(8);
+    const nomHeight = doc.heightOfString(nomComplet, { width: W - 12, align: "center" });
     doc
       .fillColor(COLORS.navy)
-      .font("Times-Bold")
-      .fontSize(10)
-      .text(`${opts.prenoms.toUpperCase()} ${opts.nom.toUpperCase()}`, 6, y, {
-        width: W - 12,
-        align: "center",
-      });
+      .text(nomComplet, 6, y, { width: W - 12, align: "center" });
 
-    y += 13;
+    y += nomHeight + 4;
     const roleLabel = ROLE_LABELS[opts.role];
     const fonctionLigne = [opts.statut === "moniteur" ? "Moniteur" : "Assistant", opts.poste]
       .filter(Boolean)

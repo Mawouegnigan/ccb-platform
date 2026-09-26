@@ -190,7 +190,7 @@ export default function MembresTable({
                     {m.identifiant && m.statut_validation === "valide" && (
                       
                       
-                      <a href={`/api/carte-membre/${m.id}`}
+                      <a href={`/api/carte-membre/${m.id}?t=${Date.now()}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-navy hover:underline text-xs font-medium"
